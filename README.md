@@ -40,12 +40,6 @@ An intelligent disease prediction system powered by Machine Learning that predic
 
 ## 🎬 Demo
 
-### Main Interface
-![Main Interface](docs/screenshot-main.png)
-
-### Prediction Results
-![Prediction Results](docs/screenshot-results.png)
-
 **Live Demo**: Open `http://127.0.0.1:5000` after running the app
 
 ---
