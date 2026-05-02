@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MediPredict — AI Disease Prediction</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ── HEADER ── -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">🩺</span>
+        <span class="logo-text">MediPredict</span>
+        <span class="logo-badge">AI</span>
+      </div>
+      <p class="header-sub">Symptom-based disease prediction powered by Machine Learning</p>
+    </div>
+  </header>
+
+  <!-- ── MAIN ── -->
+  <main class="main">
+
+    <!-- STEP INDICATOR -->
+    <div class="steps">
+      <div class="step active" id="step-1">
+        <div class="step-num">1</div>
+        <span>Select Symptoms</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" id="step-2">
+        <div class="step-num">2</div>
+        <span>Review</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" id="step-3">
+        <div class="step-num">3</div>
+        <span>Results</span>
+      </div>
+    </div>
+
+    <div class="content-grid">
+
+      <!-- LEFT PANEL: Symptom Selector -->
+      <section class="card symptom-panel">
+        <div class="card-header">
+          <h2>🔍 Search & Select Symptoms</h2>
+          <span class="badge" id="selected-count">0 selected</span>
+        </div>
+
+        <div class="search-box">
+          <span class="search-icon">🔎</span>
+          <input
+            type="text"
+            id="symptom-search"
+            placeholder="Type a symptom (e.g. headache, fever)..."
+            autocomplete="off"
+          />
+          <button class="clear-search" id="clear-search" title="Clear search">✕</button>
+        </div>
+
+        <div class="symptom-list-wrapper">
+          <div class="symptom-list" id="symptom-list">
+            {% for s in symptoms %}
+            <div
+              class="symptom-chip"
+              data-value="{{ s.value }}"
+              data-label="{{ s.label }}"
+              onclick="toggleSymptom(this)"
+            >
+              <span class="chip-icon">＋</span>
+              <span class="chip-label">{{ s.label }}</span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="panel-footer">
+          <button class="btn btn-ghost" onclick="clearAll()">🗑 Clear All</button>
+          <button class="btn btn-primary" id="predict-btn" onclick="predict()" disabled>
+            <span class="btn-icon">⚡</span> Predict Disease
+          </button>
+        </div>
+      </section>
+
+      <!-- RIGHT PANEL: Selected + Results -->
+      <div class="right-col">
+
+        <!-- Selected Symptoms -->
+        <section class="card selected-panel">
+          <div class="card-header">
+            <h2>✅ Selected Symptoms</h2>
+            <span class="hint-text">Click a tag to remove</span>
+          </div>
+          <div class="selected-tags" id="selected-tags">
+            <div class="empty-state" id="empty-selected">
+              <span>No symptoms selected yet.</span>
+              <small>Search and click symptoms on the left.</small>
+            </div>
+          </div>
+        </section>
+
+        <!-- Suggestions -->
+        <section class="card suggestion-panel" id="suggestion-panel" style="display:none">
+          <div class="card-header">
+            <h2>💡 Related Symptoms</h2>
+            <small>Based on your current selection</small>
+          </div>
+          <div class="suggestion-list" id="suggestion-list"></div>
+        </section>
+
+        <!-- Result Panel -->
+        <section class="card result-panel" id="result-panel" style="display:none">
+          <div class="card-header">
+            <h2>🏥 Prediction Results</h2>
+          </div>
+
+          <!-- Primary Result -->
+          <div class="primary-result" id="primary-result">
+            <div class="disease-icon" id="result-icon">🏥</div>
+            <div class="disease-info">
+              <div class="disease-name" id="result-disease">—</div>
+              <div class="disease-meta">
+                <span class="severity-badge" id="result-severity">—</span>
+                <span class="symptom-used" id="result-symptoms">—</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Top 5 Chart -->
+          <div class="top-diseases" id="top-diseases-section">
+            <h3>Top Predictions</h3>
+            <div class="confidence-warning" id="confidence-warning" style="display:none">
+              ⚠️ These symptoms are common to many diseases. The model's top predictions are very close — please add more specific symptoms for a better result.
+            </div>
+            <div id="top-diseases-list"></div>
+          </div>
+
+          <!-- Disclaimer -->
+          <div class="disclaimer">
+            ⚠️ This tool is for educational purposes only. Always consult a qualified medical professional for diagnosis and treatment.
+          </div>
+
+          <button class="btn btn-ghost full-width" onclick="resetAll()">🔄 Start Over</button>
+        </section>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loading-overlay">
+    <div class="spinner"></div>
+    <p>Analyzing symptoms…</p>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // Inject symptoms data from Flask
+    const ALL_SYMPTOMS = {{ symptoms | tojson }};
+  </script>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
